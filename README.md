@@ -5,7 +5,7 @@
 - Ariel Zubrzycki 
 
 ## Proyecto: Montacarga
-![Tinkercad](./img/montaCarga.png)
+![Tinkercad](./img/Montacarga.png)
 
 ## Diagramas esquematicos:
 ![Tinkercad](./img/DiagramaEsquematico.png)
