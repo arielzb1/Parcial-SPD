@@ -5,10 +5,11 @@
 - Ariel Zubrzycki 
 
 ## Proyecto: Montacarga
-![Tinkercad](./img/Montacarga.png)
+![Tinkercad](./img/montaCarga.png)
 
-## Diagrama esquematico
+## Diagramas esquematicos:
 ![Tinkercad](./img/DiagramaEsquematico.png)
+![Tinkercad](./img/DiagramaEsquematico2.png)
 
 ## Descripción
 Se nos pide armar un modelo de montacarga funcional como maqueta para un hospital. El
@@ -42,6 +43,10 @@ implementado.
 • Deberán explicar el funcionamiento integral utilizando documentación
 MarkDown.
 
+4_Se debe agregar un sensor según el grupo y la funcionalidad que usted se imagine:
+Photoresistor
+Sensor Ultra sonico
+SensorInclinado
 
 ~~~ C (lenguaje en el que esta escrito)
 #define led_A 2
@@ -51,13 +56,24 @@ MarkDown.
 #define led_E 6
 #define led_F 7
 #define led_G 8
+#define TRIGGER A5
+#define ECHO  A4
+#define VELOCIDAD_SONIDO 34300
 
+
+float distancia;
+int tiempo;
+int cargaIngresada;
 int piso = 0;
-int botonAscender = 0;
-int botonDescender = 0;
-int botonPausa = 0;
+int botonAscender;
+int botonDescender;
+int botonPausa;
 int ledRojo = LOW;
 int ledVerde = LOW;
+int photoresistor;
+int dia;
+int sensorTilt;
+int cargaInclinada;
 
 void setup()
 {
@@ -67,7 +83,6 @@ void setup()
   pinMode(A3, INPUT_PULLUP);
   pinMode(13, OUTPUT);
   pinMode(12, OUTPUT);
-
   pinMode(led_A, OUTPUT);
   pinMode(led_B, OUTPUT);
   pinMode(led_C, OUTPUT);
@@ -75,6 +90,11 @@ void setup()
   pinMode(led_E, OUTPUT);
   pinMode(led_F, OUTPUT);
   pinMode(led_G, OUTPUT);
+  pinMode(TRIGGER, OUTPUT);
+  pinMode(ECHO, INPUT);
+  pinMode(A0, INPUT);
+  pinMode(9, INPUT);
+  pinMode(10, OUTPUT);
   
   digitalWrite(led_A, HIGH);
   digitalWrite(led_B, HIGH);
@@ -114,11 +134,72 @@ void loop()
   }
    
   delay(100);
-  estadoMontaCarga(ledVerde, ledRojo);
+  ambienteActual();
+  
+  if(dia == 1)
+  {
+  	estadoMontaCarga(ledVerde, ledRojo);
+  }
+}
+
+void cargaBuenEstado()
+{
+  ingresoDeCarga();
+  sensorInclinado();
+  
+  if(cargaIngresada == 0 || cargaInclinada == 0)
+  {
+    digitalWrite(12, LOW);
+    digitalWrite(13, LOW);
+    Serial.println("El montacarga no tiene ninguna carga encima o la carga esta inclinada");
+  }
+}
+
+void sensorInclinado()
+{
+  digitalWrite(9, HIGH);
+  cargaInclinada = digitalRead(9);
+}
+
+void ambienteActual()
+{
+  photoresistor = analogRead(A0);
+    
+  if(photoresistor == 13)
+  {
+    dia = 1;
+  }
+  else
+  {
+    dia = 0;
+  }
+}
+
+void ingresoDeCarga()
+{
+  digitalWrite(TRIGGER, LOW);
+  delayMicroseconds(2);
+  digitalWrite(TRIGGER, HIGH);
+  delayMicroseconds(5);
+  digitalWrite(TRIGGER, LOW);
+  tiempo=pulseIn(ECHO, HIGH);
+  
+  distancia = tiempo/2 * 0.000001 * VELOCIDAD_SONIDO;
+  
+  if(distancia > 100 && distancia < 200)
+  {
+    cargaIngresada = 1;
+  }
+  else
+  {
+    cargaIngresada = 0;
+  }
 }
 
 void estadoMontaCarga(int ledVerde, int ledRojo)
 {
+  cargaBuenEstado();
+  
   if(ledVerde == HIGH) // Led Ascender
   {
     subirPiso();
@@ -254,7 +335,7 @@ void pisoActual(int piso)
 ~~~
 
 ## :robot: Link al proyecto
-- [proyecto](https://www.tinkercad.com/things/cnA1IdGiebW-1d-ariel-zubrzycki-parcial/editel?sharecode=5KKIiFmEhs5FivAtu2MbWn7XDnpXsF9ZqbPMxW4moHk)
+- [proyecto](https://www.tinkercad.com/things/cnA1IdGiebW-1d-ariel-zubrzycki-parcial/editel)
 
 
 
